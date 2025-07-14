@@ -108,12 +108,14 @@ async function executeToolWithParameters(client, toolName, parameters) {
 }
 
 async function queryAnthropicWithContext(toolResults, userQuery) {
+  console.log(' tool results: ' + toolResults)
   console.log('🤖 Sending query to Anthropic with MCP tool context...');
 
   // Prepare the context from tool results
   const toolContext = toolResults.map(result => 
     `Tool: ${result.toolName}\nParameters: ${JSON.stringify(result.parameters)}\nResult: ${result.result}`
   ).join('\n\n');
+  console.log('this is tool context' + toolContext)
 
   const systemPrompt = `You are an AI assistant with access to various tools through the Model Context Protocol (MCP). 
 You have executed the following tools and received these results:
@@ -184,20 +186,22 @@ async function main() {
     const toolResults = [];
 
     // Execute weather tool if available
-    // const weatherTool = tools.find(tool => tool.name === 'get-weather');
-    // if (weatherTool) {
-    //   const weatherResult = await executeToolWithParameters(client, 'get-weather', { location: 'New York' });
-    //   toolResults.push({
-    //     toolName: 'get-weather',
-    //     parameters: { location: 'New York' },
-    //     result: weatherResult
-    //   });
-    // }
+    const weatherTool = tools.find(tool => tool.name === 'get-weather');
+    if (weatherTool) {
+      const weatherResult = await executeToolWithParameters(client, 'get-weather', { location: 'New York' });
+      console.log('weather result: ' + weatherResult)
+      toolResults.push({
+        toolName: 'get-weather',
+        parameters: { location: 'New York' },
+        result: weatherResult
+      });
+    }
 
     // Execute calculator tool if available
     const calcTool = tools.find(tool => tool.name === 'calculate');
     if (calcTool) {
       const calcResult = await executeToolWithParameters(client, 'calculate', { expression: '15 + 25' });
+      console.log('calc result: ' + calcResult)
       toolResults.push({
         toolName: 'calculate',
         parameters: { expression: '15 + 25' },
